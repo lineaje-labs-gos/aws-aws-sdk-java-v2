@@ -222,7 +222,7 @@ public class EndpointResolverInterceptorSpec implements ClassSpec {
                            RegionSet.class, RegionSet.class);
             b.addStatement("optionBuilder.putSignerProperty($T.REGION_SET, regionSet)", AwsV4aHttpSigner.class);
             b.addStatement("selectedAuthScheme = new $T(selectedAuthScheme.identity(), selectedAuthScheme.signer(), "
-                           + "optionBuilder.build())", SelectedAuthScheme.class);
+                           + "optionBuilder.build(), selectedAuthScheme.identityProvider())", SelectedAuthScheme.class);
             b.endControlFlow();
         }
         b.addStatement("executionAttributes.putAttribute($T.SELECTED_AUTH_SCHEME, selectedAuthScheme)",
@@ -766,7 +766,8 @@ public class EndpointResolverInterceptorSpec implements ClassSpec {
                           AwsV4HttpSigner.class);
         code.endControlFlow();
 
-        code.addStatement("return new $T<>(selectedAuthScheme.identity(), selectedAuthScheme.signer(), option.build())",
+        code.addStatement("return new $T<>(selectedAuthScheme.identity(), selectedAuthScheme.signer(), option.build(), "
+                          + "selectedAuthScheme.identityProvider())",
                           SelectedAuthScheme.class);
         code.endControlFlow();
         return code.build();
@@ -799,7 +800,8 @@ public class EndpointResolverInterceptorSpec implements ClassSpec {
                           AwsV4aHttpSigner.class);
         code.endControlFlow();
 
-        code.addStatement("return new $T<>(selectedAuthScheme.identity(), selectedAuthScheme.signer(), option.build())",
+        code.addStatement("return new $T<>(selectedAuthScheme.identity(), selectedAuthScheme.signer(), option.build(), "
+                          + "selectedAuthScheme.identityProvider())",
                           SelectedAuthScheme.class);
         code.endControlFlow();
         return code.build();
@@ -828,7 +830,8 @@ public class EndpointResolverInterceptorSpec implements ClassSpec {
                           AwsV4HttpSigner.class);
         code.endControlFlow();
 
-        code.addStatement("return new $T<>(selectedAuthScheme.identity(), selectedAuthScheme.signer(), option.build())",
+        code.addStatement("return new $T<>(selectedAuthScheme.identity(), selectedAuthScheme.signer(), option.build(), "
+                          + "selectedAuthScheme.identityProvider())",
                           SelectedAuthScheme.class);
         code.endControlFlow();
         return code.build();

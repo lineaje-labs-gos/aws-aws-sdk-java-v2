@@ -25,6 +25,7 @@ import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
+import software.amazon.awssdk.identity.spi.AwsCredentialsIdentity;
 import software.amazon.awssdk.services.sts.StsClient;
 import software.amazon.awssdk.utils.Logger;
 import software.amazon.awssdk.utils.SdkAutoCloseable;
@@ -124,6 +125,19 @@ public abstract class StsCredentialsProvider implements AwsCredentialsProvider, 
     @Override
     public void close() {
         sessionCache.close();
+    }
+
+    @Override
+    public void invalidate(AwsCredentialsIdentity identity) {
+        if (identity instanceof AwsCredentialsIdentity) {
+            String rejectedAccessKeyId = identity.accessKeyId();
+            sessionCache.invalidate(cachedCreds -> {
+                if (cachedCreds instanceof AwsCredentialsIdentity) {
+                    return rejectedAccessKeyId.equals(((AwsCredentialsIdentity) cachedCreds).accessKeyId());
+                }
+                return false;
+            });
+        }
     }
 
     /**

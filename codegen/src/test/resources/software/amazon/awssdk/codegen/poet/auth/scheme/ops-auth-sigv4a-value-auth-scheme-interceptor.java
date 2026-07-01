@@ -138,7 +138,7 @@ public final class DatabaseAuthSchemeInterceptor implements ExecutionInterceptor
             identity = MetricUtils.reportDuration(() -> identityProvider.resolveIdentity(identityRequestBuilder.build()),
                                                   metricCollector, metric);
         }
-        return new SelectedAuthScheme<>(identity, signer, authOption);
+        return new SelectedAuthScheme<>(identity, signer, authOption, identityProvider);
     }
 
     private SdkMetric<Duration> getIdentityMetric(IdentityProvider<?> identityProvider) {
@@ -160,7 +160,7 @@ public final class DatabaseAuthSchemeInterceptor implements ExecutionInterceptor
             existingAuthScheme.authSchemeOption().forEachIdentityProperty(selectedOption::putIdentityPropertyIfAbsent);
             existingAuthScheme.authSchemeOption().forEachSignerProperty(selectedOption::putSignerPropertyIfAbsent);
             selectedAuthScheme = new SelectedAuthScheme<>(selectedAuthScheme.identity(), selectedAuthScheme.signer(),
-                                                          selectedOption.build());
+                                                          selectedOption.build(), selectedAuthScheme.identityProvider());
         }
         attributes.putAttribute(SdkInternalExecutionAttribute.SELECTED_AUTH_SCHEME, selectedAuthScheme);
     }

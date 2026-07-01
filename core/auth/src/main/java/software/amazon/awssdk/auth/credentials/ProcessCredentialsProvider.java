@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.core.useragent.BusinessMetricFeatureId;
+import software.amazon.awssdk.identity.spi.AwsCredentialsIdentity;
 import software.amazon.awssdk.protocols.jsoncore.JsonNode;
 import software.amazon.awssdk.protocols.jsoncore.JsonNodeParser;
 import software.amazon.awssdk.utils.DateUtils;
@@ -165,6 +166,19 @@ public final class ProcessCredentialsProvider
     @Override
     public AwsCredentials resolveCredentials() {
         return processCredentialCache.get();
+    }
+
+    @Override
+    public void invalidate(AwsCredentialsIdentity identity) {
+        if (identity instanceof AwsCredentialsIdentity) {
+            String rejectedAccessKeyId = identity.accessKeyId();
+            processCredentialCache.invalidate(cachedCreds -> {
+                if (cachedCreds instanceof AwsCredentialsIdentity) {
+                    return rejectedAccessKeyId.equals(((AwsCredentialsIdentity) cachedCreds).accessKeyId());
+                }
+                return false;
+            });
+        }
     }
 
     private RefreshResult<AwsCredentials> refreshCredentials() {

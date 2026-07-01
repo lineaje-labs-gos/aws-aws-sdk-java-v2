@@ -367,7 +367,7 @@ public final class AuthSchemeInterceptorSpec implements ClassSpec {
                              MetricUtils.class)
                .endControlFlow();
 
-        builder.addStatement("return new $T<>(identity, signer, authOption)", SelectedAuthScheme.class);
+        builder.addStatement("return new $T<>(identity, signer, authOption, identityProvider)", SelectedAuthScheme.class);
         return builder.build();
     }
 
@@ -413,9 +413,10 @@ public final class AuthSchemeInterceptorSpec implements ClassSpec {
                              + "(selectedOption::putIdentityPropertyIfAbsent)")
                .addStatement("existingAuthScheme.authSchemeOption().forEachSignerProperty"
                              + "(selectedOption::putSignerPropertyIfAbsent)")
-               .addStatement("$N = new $T<>($N.identity(), $N.signer(), selectedOption.build())",
+               .addStatement("$N = new $T<>($N.identity(), $N.signer(), selectedOption.build(), $N.identityProvider())",
                              selectedAuthSchemeParamName,
                              SelectedAuthScheme.class,
+                             selectedAuthSchemeParamName,
                              selectedAuthSchemeParamName,
                              selectedAuthSchemeParamName);
         builder.endControlFlow();

@@ -43,6 +43,7 @@ import software.amazon.awssdk.core.SdkSystemSetting;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.useragent.BusinessMetricFeatureId;
 import software.amazon.awssdk.core.util.SdkUserAgent;
+import software.amazon.awssdk.identity.spi.AwsCredentialsIdentity;
 import software.amazon.awssdk.regions.util.ResourcesEndpointProvider;
 import software.amazon.awssdk.regions.util.ResourcesEndpointRetryPolicy;
 import software.amazon.awssdk.utils.StringUtils;
@@ -187,6 +188,19 @@ public final class ContainerCredentialsProvider
     @Override
     public AwsCredentials resolveCredentials() {
         return credentialsCache.get();
+    }
+
+    @Override
+    public void invalidate(AwsCredentialsIdentity identity) {
+        if (identity instanceof AwsCredentialsIdentity) {
+            String rejectedAccessKeyId = identity.accessKeyId();
+            credentialsCache.invalidate(cachedCreds -> {
+                if (cachedCreds instanceof AwsCredentialsIdentity) {
+                    return rejectedAccessKeyId.equals(((AwsCredentialsIdentity) cachedCreds).accessKeyId());
+                }
+                return false;
+            });
+        }
     }
 
     @Override

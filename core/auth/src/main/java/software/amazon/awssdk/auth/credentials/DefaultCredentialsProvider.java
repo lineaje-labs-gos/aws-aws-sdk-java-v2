@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import software.amazon.awssdk.annotations.SdkPublicApi;
 import software.amazon.awssdk.auth.credentials.internal.LazyAwsCredentialsProvider;
+import software.amazon.awssdk.identity.spi.AwsCredentialsIdentity;
 import software.amazon.awssdk.profiles.ProfileFile;
 import software.amazon.awssdk.profiles.ProfileFileSupplier;
 import software.amazon.awssdk.utils.SdkAutoCloseable;
@@ -132,6 +133,11 @@ public final class DefaultCredentialsProvider
     @Override
     public AwsCredentials resolveCredentials() {
         return providerChain.resolveCredentials();
+    }
+
+    @Override
+    public void invalidate(AwsCredentialsIdentity identity) {
+        providerChain.invalidate(identity);
     }
 
     @Override

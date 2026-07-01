@@ -25,6 +25,8 @@ import software.amazon.awssdk.auth.credentials.internal.WebIdentityCredentialsUt
 import software.amazon.awssdk.auth.credentials.internal.WebIdentityTokenCredentialProperties;
 import software.amazon.awssdk.core.SdkSystemSetting;
 import software.amazon.awssdk.core.useragent.BusinessMetricFeatureId;
+import software.amazon.awssdk.identity.spi.AwsCredentialsIdentity;
+import software.amazon.awssdk.identity.spi.IdentityProvider;
 import software.amazon.awssdk.utils.IoUtils;
 import software.amazon.awssdk.utils.SdkAutoCloseable;
 import software.amazon.awssdk.utils.ToString;
@@ -161,6 +163,16 @@ public class WebIdentityTokenFileCredentialsProvider
     @Override
     public void close() {
         IoUtils.closeIfCloseable(credentialsProvider, null);
+    }
+
+    @Override
+    public void invalidate(AwsCredentialsIdentity identity) {
+        if (credentialsProvider instanceof IdentityProvider) {
+            @SuppressWarnings("unchecked")
+            IdentityProvider<AwsCredentialsIdentity> provider =
+                (IdentityProvider<AwsCredentialsIdentity>) credentialsProvider;
+            provider.invalidate(identity);
+        }
     }
 
     /**

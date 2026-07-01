@@ -131,6 +131,20 @@ public final class AwsCredentialsProviderChain
     }
 
     @Override
+    public void invalidate(AwsCredentialsIdentity identity) {
+        for (IdentityProvider<? extends AwsCredentialsIdentity> provider : credentialsProviders) {
+            try {
+                @SuppressWarnings("unchecked")
+                IdentityProvider<AwsCredentialsIdentity> typedProvider =
+                    (IdentityProvider<AwsCredentialsIdentity>) provider;
+                typedProvider.invalidate(identity);
+            } catch (Exception e) {
+                log.debug(() -> "Failed to invalidate provider " + provider + ": " + e.getMessage(), e);
+            }
+        }
+    }
+
+    @Override
     public void close() {
         credentialsProviders.forEach(c -> IoUtils.closeIfCloseable(c, null));
     }
